@@ -1,9 +1,65 @@
-# DrawGestures-NeutonAI
+# How to integrate Neuton into your firmware project 
 
-Whenever I get time, I hunt for ways to make myself super-productive either by reducing daily tasks like opening WhatsApp, checking emails and contacts. Long before we started swiping and tapping on touch screens, mouse gestures were touted as the humanist way of interacting with our computers. Simple patterns you traced on screen by holding a mouse button in order to perform a shortcut,  mostly because clicking a button or swiping on a trackpad is always going to be a quicker way to do something on a PC than memorizing and executing an obscure command glyph.
-But while mouse gestures make little sense on the PC, it turns out they’re a natural fit on touch-screen devices. System shortcuts just by drawing a symbol on the screen. And I’ve got to admit, it’s such a natural way to interact with a touch screen and very fast indeed. Keyboards, although much improved over the years, require a lot of attention to hit the right buttons. :-()
+## Include header file
 
-# Introduction
-In this project, we will learn how to make a Machine Learning model for an embedded device to recognize complex drawing gestures like digits, alphabets, and special symbols on TFT touch screen display units. I will also explain how this project might benefit from using such drawing gestures to add fun to our productivity.
+Copy all files from this archive to your project and include header file:
+``` C
+#include "neuton.h"
+```
 
-Full project on hackster. https://hackster.io/vilaksh01
+The library contains functions to get model information such as:
+* task type (regression, classification, etc.);
+* neurons and weights count;
+* window buffer size;
+* input and output features count;
+* model size and RAM usage;
+* float support flag;
+* quantization level.
+
+Main functions are:
+* `neuton_model_set_inputs` - to set input values;
+* `neuton_model_run_inference` - to make predictions.
+
+
+## Set input values
+
+Make a float array with model inputs. Inputs count and order should be the same as in the training dataset.
+
+``` C
+float inputs[] = {
+    feature_0,
+    feature_1,
+    // ...
+    feature_N
+};
+```
+
+Pass this array to `neuton_model_set_inputs` function. 
+
+If digital signal processing option was selected on platform you should call `neuton_model_set_inputs` multiple times for each sample to fill internal window buffer. Function will return `0` when buffer is full, this indicates that model is ready for prediction.
+
+
+##	Make prediction
+
+When buffer is ready you should call `neuton_model_run_inference` with two arguments:
+* pointer to `index` of predicted class;
+* pointer to neural net `outputs` (dimension of array can be read using `neuton_model_outputs_count` function).
+
+For regression task output value will be stored at `outputs[0]`.
+For classifications task `index` will contain class index with maximal probability, `outputs` will contains probabilities of each class. Thus, you can get predicted class probability at `outputs[index]`.
+
+Function will return `0` on successful prediction.
+``` C
+if (neuton_model_set_inputs(inputs) == 0)
+{
+    uint16_t index;
+    float* outputs;
+    
+    if (neuton_model_run_inference(&index, &outputs) == 0)
+    {
+        // code for handling prediction result
+    }
+}
+```
+
+
