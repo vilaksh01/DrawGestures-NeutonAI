@@ -99,25 +99,21 @@ void loop()
         {
           // code for handling prediction result
           // Serial.println("Prediction: " + String(index));   
-          if (index == 13)
-          {
-            Serial.println("w");
-          }
-          if (index == 12)
-          {
-            Serial.println("m");
-          }
-          if (index == 11)
-          {
-            Serial.println("c");
-          }
-          if (index == 10)
+          if (index == 0)
           {
             Serial.println("@");
           }
-          if (index == 0)
+          if (index == 1)
           {
-            Serial.println("0");                
+            Serial.println("c");
+          }
+          if (index == 2)
+          {
+            Serial.println("m");
+          }
+          if (index == 3)
+          {
+            Serial.println("w");
           }
         }
       }  
